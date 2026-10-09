@@ -1,0 +1,85 @@
+name: Windows build, tests and package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Release build and xUnit tests
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore Duplify.sln
+
+      - name: Build Release
+        run: dotnet build Duplify.sln -c Release --no-restore -warnaserror
+
+      - name: Run xUnit tests
+        run: >
+          dotnet test Duplify.sln -c Release
+          --no-build --no-restore --nologo
+          --blame-hang --blame-hang-timeout 2m
+          --logger "trx;LogFileName=tests.trx"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Duplify-test-results
+          path: TestResults/**
+          if-no-files-found: warn
+          retention-days: 7
+
+  package:
+    name: Portable Windows x64 package
+    needs: tests
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish self-contained application
+        run: >
+          dotnet publish Duplify.csproj -c Release -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=false -p:PublishTrimmed=false
+          -o artifacts/portable/Duplify
+
+      - name: Package application and documentation
+        shell: pwsh
+        run: |
+          $packagePath = Join-Path $env:GITHUB_WORKSPACE 'artifacts\portable\Duplify'
+          Copy-Item -LiteralPath LICENSE, README.md -Destination $packagePath
+          $docsPath = Join-Path $packagePath 'docs'
+          New-Item -ItemType Directory -Path $docsPath -Force | Out-Null
+          Copy-Item -LiteralPath docs/usage.md -Destination $docsPath
+          Compress-Archive -LiteralPath $packagePath -DestinationPath artifacts/portable/Duplify-windows-x64.zip -Force
+
+      - name: Upload portable application
+        uses: actions/upload-artifact@v4
+        with:
+          name: Duplify-windows-x64
+          path: artifacts/portable/Duplify-windows-x64.zip
+          if-no-files-found: error
+          retention-days: 14

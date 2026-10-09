@@ -1,0 +1,35 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.review-temp/
+.diagnostics/
+*.log
+TestResults/
+.cursor/
+
+# Portable build and test outputs
+artifacts/
+**/publish/
+*.trx
+*.coverage
+*.coveragexml
+.vscode/
+.idea/
+
+# Local profiles, runtime journals, secrets and backup files
+settings.json
+settings.json.bad
+journal.jsonl*
+*.log.*
+*.bak
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem
+*.key

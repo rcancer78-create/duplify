@@ -1,0 +1,64 @@
+<Window x:Class="Duplify.ActionSummaryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Результат"
+        Width="480"
+        MinHeight="200"
+        MaxHeight="560"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="{StaticResource WindowBgBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource AppFont}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="HeaderText"
+                   Grid.Row="0"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,12" />
+
+        <Border Grid.Row="1"
+                Background="#1F1F23"
+                BorderBrush="{StaticResource SubtleBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="14">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="360">
+                <TextBlock x:Name="MessageText"
+                           TextWrapping="Wrap"
+                           FontSize="13"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           LineHeight="20" />
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button x:Name="OpenJournalButton"
+                    Content="Открыть журнал"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Height="32"
+                    Padding="16,0"
+                    Margin="0,0,8,0"
+                    IsDefault="True"
+                    Click="OnOpenJournalClick" />
+            <Button x:Name="CloseButton"
+                    Content="Закрыть"
+                    Height="32"
+                    Padding="16,0"
+                    IsCancel="True"
+                    Click="OnCloseClick" />
+        </StackPanel>
+    </Grid>
+</Window>
